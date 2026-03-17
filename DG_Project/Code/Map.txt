@@ -1,0 +1,64 @@
+Code/
+├── CODE_USAGE_GUIDE.md          ← THE main guide: every field explained
+│
+├── Core/
+│   ├── GameManager.cs           ← Central state machine (Sailing/BossFight/etc.)
+│   ├── GameEvents.cs            ← Static event bus (all game-wide events)
+│   └── SceneLoader.cs           ← Additive scene loading/unloading
+│
+├── Player/
+│   ├── PlayerController.cs      ← Movement, attack, dodge, interact
+│   ├── PlayerStats.cs           ← HP, stamina, speed, damage values
+│   ├── PlayerInventory.cs       ← Item management, use/add/remove
+│   ├── PlayerInputHandler.cs    ← New Input System wrapper
+│   └── PlayerAbilityHandler.cs  ← All 5 abilities (Fire Dash, Ice Shield, etc.)
+│
+├── Boat/
+│   ├── BoatController.cs        ← Steering, boost, harpoon, lantern, anchor
+│   ├── BoatStats.cs             ← Durability, boost charges, harpoon shots
+│   └── OceanBuoyancy.cs        ← Wave simulation + float point physics
+│
+├── Enemies/
+│   ├── IStateMachine.cs         ← Generic StateMachine + IState interface
+│   ├── EnemyBase.cs             ← Abstract base for all enemies
+│   ├── EnemyStates.cs           ← Idle/Patrol, Alert, Attack states
+│   └── EmberLizard.cs           ← Example enemy (explodes on death)
+│
+├── Bosses/
+│   ├── BossBase.cs              ← Abstract base: 3 phases, health, death
+│   └── Ignar_MoltenDrake.cs    ← Full boss implementation (3 phases, all attacks)
+│
+├── Puzzles/
+│   ├── PuzzleBase.cs            ← Abstract base for all puzzles
+│   ├── SymbolMatchPuzzle.cs     ← Rotate tiles to match pattern
+│   ├── LightBeamPuzzle.cs       ← Bounce beams off mirrors to receivers
+│   └── PushBlockPuzzle.cs       ← Push blocks onto pressure plates
+│
+├── World/
+│   ├── WeatherSystem.cs         ← Calm/Stormy/Foggy with crossfading
+│   ├── DayNightCycle.cs         ← Sun rotation, skybox blend, IsNoon()
+│   └── IslandProximityLoader.cs ← Auto load/unload island scenes by distance
+│
+├── SaveSystem/
+│   ├── GameSaveData.cs          ← Serializable save data structure
+│   └── SaveManager.cs           ← JSON save/load, auto-save on boss defeat
+│
+├── UI/
+│   ├── HUDManager.cs            ← Health, stamina, boat durability, crystals
+│   ├── BossHealthBarUI.cs       ← Boss name + HP bar with slide-in animation
+│   └── DialogueManager.cs       ← Typewriter NPC dialogue with portraits
+│
+├── Audio/
+│   └── AudioManager.cs          ← Music crossfade, SFX playback, volume control
+│
+├── Utilities/
+│   ├── ObjectPool.cs            ← Generic pool + PoolManager (all spawnable objects)
+│   └── CameraShaker.cs          ← Cinemachine shake (Light/Medium/Heavy presets)
+│
+└── Data/
+    ├── Interfaces.cs            ← IDamageable, IInteractable
+    ├── EnemyData.cs             ← ScriptableObject for enemy stats
+    ├── BossData.cs              ← ScriptableObject for boss stats + rewards
+    ├── IslandData.cs            ← ScriptableObject for island scene info
+    ├── ItemData.cs              ← ScriptableObject for items + ItemDatabase
+    └── AbilityData.cs           ← ScriptableObject for abilities + DialogueSequence
