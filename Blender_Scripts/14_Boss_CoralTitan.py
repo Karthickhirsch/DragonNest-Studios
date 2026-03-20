@@ -661,7 +661,7 @@ def build_scary_attachments(mats, col):
 
     # ── 12 kelp/seaweed strands hanging from joints ──
     kelp_attach=[(sx*1.90,0,2.90) for sx in [-1,1]] + [(sx*0.72,0,0.82) for sx in [-1,1]] + \
-                [(sx*0.68,0,0.24) for sx in [-1,1]] + [(0,0,1.58),(0,0,4.12),(sx*1.18,0,3.70) for sx in [-1,1]] + [(0,0,2.50),(0,0,3.00)]
+                [(sx*0.68,0,0.24) for sx in [-1,1]] + [(0,0,1.58),(0,0,4.12)] + [(sx*1.18,0,3.70) for sx in [-1,1]] + [(0,0,2.50),(0,0,3.00)]
     for ki2,kp in enumerate(kelp_attach[:12]):
         for ks in range(2):
             ksa=rng.uniform(0,2*math.pi); ksr=rng.uniform(0.08,0.18)
