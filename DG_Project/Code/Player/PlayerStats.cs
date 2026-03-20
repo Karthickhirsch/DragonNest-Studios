@@ -104,6 +104,14 @@ namespace IsleTrial.Player
 
         public void ConsumeDodgeStamina() => UseStamina(_staminaDrainPerDodge);
 
+        // ── Speed Modifier (used by FrostSlug slow, etc.) ─────
+
+        private float _speedMultiplier = 1f;
+        public float SpeedMultiplier => _speedMultiplier;
+
+        public void ApplySpeedModifier(float multiplier) => _speedMultiplier = Mathf.Clamp(multiplier, 0.1f, 2f);
+        public void ResetSpeedModifier() => _speedMultiplier = 1f;
+
         // ── Private ───────────────────────────────────────────
 
         private void HandleRegen()

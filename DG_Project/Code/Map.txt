@@ -1,5 +1,5 @@
 Code/
-├── CODE_USAGE_GUIDE.md          ← THE main guide: every field explained
+├── CODE_USAGE_GUIDE.md          ← THE main guide: every field explained (v2.0)
 │
 ├── Core/
 │   ├── GameManager.cs           ← Central state machine (Sailing/BossFight/etc.)
@@ -8,7 +8,7 @@ Code/
 │
 ├── Player/
 │   ├── PlayerController.cs      ← Movement, attack, dodge, interact
-│   ├── PlayerStats.cs           ← HP, stamina, speed, damage values
+│   ├── PlayerStats.cs           ← HP, stamina, speed (+ApplySpeedModifier)
 │   ├── PlayerInventory.cs       ← Item management, use/add/remove
 │   ├── PlayerInputHandler.cs    ← New Input System wrapper
 │   └── PlayerAbilityHandler.cs  ← All 5 abilities (Fire Dash, Ice Shield, etc.)
@@ -16,17 +16,21 @@ Code/
 ├── Boat/
 │   ├── BoatController.cs        ← Steering, boost, harpoon, lantern, anchor
 │   ├── BoatStats.cs             ← Durability, boost charges, harpoon shots
-│   └── OceanBuoyancy.cs        ← Wave simulation + float point physics
+│   ├── OceanBuoyancy.cs         ← Wave simulation + float point physics
+│   └── HarpoonProjectile.cs     ← [NEW] Harpoon hit, damage, pull behaviour
 │
 ├── Enemies/
 │   ├── IStateMachine.cs         ← Generic StateMachine + IState interface
 │   ├── EnemyBase.cs             ← Abstract base for all enemies
 │   ├── EnemyStates.cs           ← Idle/Patrol, Alert, Attack states
-│   └── EmberLizard.cs           ← Example enemy (explodes on death)
+│   ├── EmberLizard.cs           ← Ember Isle enemy (explodes on death)
+│   └── FrostSlug.cs             ← [NEW] Frost Isle enemy (armour + slow on hit)
 │
 ├── Bosses/
 │   ├── BossBase.cs              ← Abstract base: 3 phases, health, death
-│   └── Ignar_MoltenDrake.cs    ← Full boss implementation (3 phases, all attacks)
+│   ├── Ignar_MoltenDrake.cs     ← Ember Isle boss (3 phases, fire attacks)
+│   ├── Glaciara_FrostWarden.cs  ← [NEW] Frost Isle boss (ice shards, walls, blizzard)
+│   └── LavaBallProjectile.cs    ← [NEW] Lava ball + LavaPuddle DoT zone
 │
 ├── Puzzles/
 │   ├── PuzzleBase.cs            ← Abstract base for all puzzles
@@ -37,7 +41,14 @@ Code/
 ├── World/
 │   ├── WeatherSystem.cs         ← Calm/Stormy/Foggy with crossfading
 │   ├── DayNightCycle.cs         ← Sun rotation, skybox blend, IsNoon()
-│   └── IslandProximityLoader.cs ← Auto load/unload island scenes by distance
+│   ├── IslandProximityLoader.cs ← Auto load/unload island scenes by distance
+│   ├── NPC.cs                   ← [NEW] IInteractable NPC with dialogue + indicator
+│   ├── ChestInteractable.cs     ← [NEW] Openable chest, spawns loot from LootTable
+│   ├── DoorGate.cs              ← [NEW] Puzzle-linked door/gate (slide or rotate open)
+│   ├── ItemPickup.cs            ← [NEW] World item pickup → PlayerInventory
+│   ├── CrystalPickup.cs         ← [NEW] 6-crystal collectible system
+│   ├── BoatRepairStation.cs     ← [NEW] Dock repair station (optional item cost)
+│   └── TutorialTrigger.cs       ← [NEW] Zone-based tutorial hints + TutorialHintPanel
 │
 ├── SaveSystem/
 │   ├── GameSaveData.cs          ← Serializable save data structure
@@ -46,7 +57,11 @@ Code/
 ├── UI/
 │   ├── HUDManager.cs            ← Health, stamina, boat durability, crystals
 │   ├── BossHealthBarUI.cs       ← Boss name + HP bar with slide-in animation
-│   └── DialogueManager.cs       ← Typewriter NPC dialogue with portraits
+│   ├── DialogueManager.cs       ← Typewriter NPC dialogue with portraits
+│   ├── MainMenuController.cs    ← [NEW] Play/Continue/Load/Quit + save slots
+│   ├── PauseMenuController.cs   ← [NEW] ESC pause menu (Resume/Save/MainMenu/Quit)
+│   ├── GameOverScreen.cs        ← [NEW] Death screen with Retry + Main Menu
+│   └── MapUI.cs                 ← [NEW] M-key world map with island + player markers
 │
 ├── Audio/
 │   └── AudioManager.cs          ← Music crossfade, SFX playback, volume control
@@ -61,4 +76,5 @@ Code/
     ├── BossData.cs              ← ScriptableObject for boss stats + rewards
     ├── IslandData.cs            ← ScriptableObject for island scene info
     ├── ItemData.cs              ← ScriptableObject for items + ItemDatabase
-    └── AbilityData.cs           ← ScriptableObject for abilities + DialogueSequence
+    ├── AbilityData.cs           ← ScriptableObject for abilities + DialogueSequence
+    └── LootTable.cs             ← [NEW] Weighted loot table ScriptableObject

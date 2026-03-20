@@ -19,22 +19,37 @@
 11. [Boat — BoatStats](#11-boat--boatstats)
 12. [Boat — OceanBuoyancy](#12-boat--oceanbuoyancy)
 13. [Enemies — EnemyBase & EmberLizard](#13-enemies--enemybase--emberlizard)
-14. [Bosses — BossBase & Ignar](#14-bosses--bossbase--ignar)
-15. [Puzzles — SymbolMatchPuzzle](#15-puzzles--symbolmatchpuzzle)
-16. [Puzzles — LightBeamPuzzle](#16-puzzles--lightbeampuzzle)
-17. [Puzzles — PushBlockPuzzle](#17-puzzles--pushblockpuzzle)
-18. [World — WeatherSystem](#18-world--weathersystem)
-19. [World — DayNightCycle](#19-world--daynightcycle)
-20. [World — IslandProximityLoader](#20-world--islandproximityloader)
-21. [Save System — SaveManager](#21-save-system--savemanager)
-22. [UI — HUDManager](#22-ui--hudmanager)
-23. [UI — BossHealthBarUI](#23-ui--bosshealthbarui)
-24. [UI — DialogueManager](#24-ui--dialoguemanager)
-25. [Audio — AudioManager](#25-audio--audiomanager)
-26. [Utilities — PoolManager](#26-utilities--poolmanager)
-27. [Utilities — CameraShaker](#27-utilities--camerashaker)
-28. [Data — ScriptableObjects](#28-data--scriptableobjects)
-29. [Complete Bootstrap Scene Setup](#29-complete-bootstrap-scene-setup)
+14. [Enemies — FrostSlug](#14-enemies--frostslug)
+15. [Bosses — BossBase & Ignar](#15-bosses--bossbase--ignar)
+16. [Bosses — Glaciara FrostWarden](#16-bosses--glaciara-frostwarden)
+17. [Puzzles — SymbolMatchPuzzle](#17-puzzles--symbolmatchpuzzle)
+18. [Puzzles — LightBeamPuzzle](#18-puzzles--lightbeampuzzle)
+19. [Puzzles — PushBlockPuzzle](#19-puzzles--pushblockpuzzle)
+20. [World — WeatherSystem](#20-world--weathersystem)
+21. [World — DayNightCycle](#21-world--daynightcycle)
+22. [World — IslandProximityLoader](#22-world--islandproximityloader)
+23. [World — NPC](#23-world--npc)
+24. [World — ChestInteractable](#24-world--chestinteractable)
+25. [World — DoorGate](#25-world--doorgate)
+26. [World — ItemPickup](#26-world--itempickup)
+27. [World — CrystalPickup](#27-world--crystalpickup)
+28. [World — BoatRepairStation](#28-world--boatrepairstation)
+29. [World — TutorialTrigger](#29-world--tutorialtrigger)
+30. [Boat — HarpoonProjectile](#30-boat--harpoonprojectile)
+31. [Bosses — LavaBallProjectile & LavaPuddle](#31-bosses--lavaballprojectile--lavapuddle)
+32. [Save System — SaveManager](#32-save-system--savemanager)
+33. [UI — MainMenuController](#33-ui--mainmenucontroller)
+34. [UI — PauseMenuController](#34-ui--pausemenucontroller)
+35. [UI — GameOverScreen](#35-ui--gameoverscreen)
+36. [UI — HUDManager](#36-ui--hudmanager)
+37. [UI — BossHealthBarUI](#37-ui--bosshealthbarui)
+38. [UI — DialogueManager](#38-ui--dialoguemanager)
+39. [UI — MapUI](#39-ui--mapui)
+40. [Audio — AudioManager](#40-audio--audiomanager)
+41. [Utilities — PoolManager](#41-utilities--poolmanager)
+42. [Utilities — CameraShaker](#42-utilities--camerashaker)
+43. [Data — ScriptableObjects (incl. LootTable)](#43-data--scriptableobjects)
+44. [Complete Bootstrap Scene Setup](#44-complete-bootstrap-scene-setup)
 
 ---
 
@@ -348,6 +363,7 @@ When a boss is defeated → `GameEvents.AbilityUnlocked(ability)` fires → `Pla
 
 ## 13. Enemies — EnemyBase & EmberLizard
 
+
 **File:** `Enemies/EnemyBase.cs`, `Enemies/EmberLizard.cs`
 
 ### Attach to: Enemy prefabs. Never attach `EnemyBase` directly — use a subclass like `EmberLizard`.
@@ -384,7 +400,47 @@ Dead (Trigger)
 
 ---
 
-## 14. Bosses — BossBase & Ignar
+## 14. Enemies — FrostSlug
+
+**File:** `Enemies/FrostSlug.cs`
+
+### Attach to: FrostSlug enemy prefab (same setup as EmberLizard).
+
+### Required Components:
+- `NavMeshAgent`
+- `Animator`
+- `CapsuleCollider`
+
+### Inspector Setup:
+| Field | Value |
+|-------|-------|
+| `Data` | Drag `FrostSlug.asset` EnemyData ScriptableObject |
+| `Detection Radius` | `7` |
+| `Attack Radius` | `1.8` |
+| `Player Layer` | "Player" layer |
+| `Patrol Waypoints` | 2–4 patrol point Transforms |
+| `Slow Multiplier` | `0.5` (half speed) |
+| `Slow Duration` | `3` |
+| `Armor Points` | `2` (absorbs 2 hits before taking damage) |
+| `Frost Patch Prefab` | Prefab with Trigger Collider + FrostSlow script |
+| `Frost Patch Duration` | `6` |
+| `Hit Ice VFX` | Ice particle prefab (plays when armor absorbs hit) |
+| `Death Frost VFX` | Frost burst particle prefab |
+
+### Armour System:
+FrostSlug absorbs the first `Armor Points` hits, playing an ice VFX but dealing no damage to HP. After armour breaks, `TakeDamage` works normally via `EnemyBase`.
+
+### Animator States Needed:
+```
+Walk, Attack, Stun, Dead
+```
+
+### Speed Modifier:
+On hit, FrostSlug calls `PlayerStats.ApplySpeedModifier(0.5f)`. Speed resets after `Slow Duration` seconds via `PlayerStats.ResetSpeedModifier()`.
+
+---
+
+## 15. Bosses — BossBase & Ignar
 
 **File:** `Bosses/BossBase.cs`, `Bosses/Ignar_MoltenDrake.cs`
 
@@ -420,7 +476,52 @@ Dead (Trigger)
 
 ---
 
-## 15. Puzzles — SymbolMatchPuzzle
+## 16. Bosses — Glaciara FrostWarden
+
+**File:** `Bosses/Glaciara_FrostWarden.cs`
+
+### Attach to: GlaciaraBoss prefab. Same setup as Ignar.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Data` | Drag `Glaciara.asset` BossData ScriptableObject |
+| `Phase2 Threshold` | `0.6` |
+| `Phase3 Threshold` | `0.3` |
+| `Phase Transition VFX` | Ice burst Particle System |
+| `Death VFX` | Shattering ice Particle System |
+| `Ice Shard Prefab` | Prefab with Rigidbody + IceShardProjectile + Collider |
+| `Shard Spawn Point` | Child Transform at boss mouth/hand |
+| `Shard Count` | `5` |
+| `Shard Spread` | `30` (degrees) |
+| `Ice Wall Prefab` | Tall ice wall mesh prefab |
+| `Ice Wall Spawn Points` | 3–4 Transforms around the arena |
+| `Charge Speed` | `18` |
+| `Charge Damage` | `35` |
+| `Blizzard VFX` | Full-arena snow particle system |
+| `Ice Spear Prefab` | Prefab with IceSpearHoming + Collider |
+| `Spear Count` | `8` |
+| `Blizzard Slow Multiplier` | `0.4` |
+
+### Phase Breakdown:
+| Phase | Trigger | Attacks |
+|-------|---------|---------|
+| Phase 1 | Start | Ice shard spread volley |
+| Phase 2 | 60% HP | Summons ice walls + charge attack |
+| Phase 3 | 30% HP | Activates blizzard + homing ice spears |
+
+### Animator States Needed:
+```
+Idle, Phase (Int), Shoot (Trigger), Charge (Trigger), Blizzard (Trigger), Hit (Trigger), Dead (Trigger)
+```
+
+### Helper Scripts (same file):
+- `IceShardProjectile` — Attach to the ice shard prefab. Calls `Initialise(damage, layer)` before launch.
+- `IceSpearHoming` — Attach to the ice spear prefab. Calls `Initialise(target, damage, layer)` and homes toward player.
+
+---
+
+## 17. Puzzles — SymbolMatchPuzzle
 
 **File:** `Puzzles/SymbolMatchPuzzle.cs`
 
@@ -445,7 +546,7 @@ Dead (Trigger)
 
 ---
 
-## 16. Puzzles — LightBeamPuzzle
+## 18. Puzzles — LightBeamPuzzle
 
 **File:** `Puzzles/LightBeamPuzzle.cs`
 
@@ -474,7 +575,7 @@ Dead (Trigger)
 
 ---
 
-## 17. Puzzles — PushBlockPuzzle
+## 19. Puzzles — PushBlockPuzzle
 
 **File:** `Puzzles/PushBlockPuzzle.cs`
 
@@ -507,7 +608,7 @@ Dead (Trigger)
 
 ---
 
-## 18. World — WeatherSystem
+## 20. World — WeatherSystem
 
 **File:** `World/WeatherSystem.cs`
 
@@ -535,7 +636,7 @@ FindObjectOfType<WeatherSystem>().SetWeather(WeatherState.Stormy);
 
 ---
 
-## 19. World — DayNightCycle
+## 21. World — DayNightCycle
 
 **File:** `World/DayNightCycle.cs`
 
@@ -560,7 +661,7 @@ if (dayNight.IsNoon()) ActivateSolarPuzzle();
 
 ---
 
-## 20. World — IslandProximityLoader
+## 22. World — IslandProximityLoader
 
 **File:** `World/IslandProximityLoader.cs`
 
@@ -584,7 +685,358 @@ if (dayNight.IsNoon()) ActivateSolarPuzzle();
 
 ---
 
-## 21. Save System — SaveManager
+## 23. World — NPC
+
+**File:** `World/NPC.cs`
+
+### Attach to: Any NPC prefab with a non-trigger Collider.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Dialogue` | Drag the NPC's `DialogueSequence` ScriptableObject |
+| `Repeat Dialogue` | OFF (plays once) or ON (plays every interaction) |
+| `Interact Indicator` | A child GameObject with a "!" Sprite above the NPC's head |
+| `Indicator Bob Speed` | `1.5` |
+| `Face Player On Interact` | ✓ ON |
+
+### Unity Steps:
+1. Create NPC prefab → add Capsule Collider + Animator + NPC script
+2. Create a child GameObject named "Indicator" → add a world-space Canvas with "!" Image
+3. Set NPC's layer to "NPC" (or "Default") — must NOT be "Enemy"
+4. Create `DialogueSequence` ScriptableObject (see section 43) and drag into `Dialogue`
+
+### Change dialogue at runtime (e.g. after a quest step):
+```csharp
+npc.SetDialogue(newDialogueSequence, resetSpokenFlag: true);
+```
+
+---
+
+## 24. World — ChestInteractable
+
+**File:** `World/ChestInteractable.cs`
+
+### Attach to: TreasureChest prefab with an Animator + Collider.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Loot Table` | Drag a `LootTable.asset` ScriptableObject (see section 43) |
+| `Loot Count` | `2` (items given per open) |
+| `Loot Spawn Point` | Child Transform above the chest opening |
+| `Open VFX` | Particle System that plays when chest opens |
+| `Open SFX` | Audio clip for chest creak |
+| `Interact Indicator` | "!" GameObject above the chest |
+
+### Animator Setup:
+Add a trigger parameter `Open` and a state "Open" that plays the lid-opening animation.
+
+### How to link with a puzzle reward:
+Set the chest as the `Reward Object` on `PuzzleBase` — when `CompletePuzzle()` fires, it activates the chest.
+
+---
+
+## 25. World — DoorGate
+
+**File:** `World/DoorGate.cs`
+
+### Attach to: Any door, gate, or portcullis GameObject.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Linked Puzzle ID` | The exact `PuzzleID` string from the puzzle that opens this door |
+| `Open Mode` | `SlideUp` (portcullis), `SlideAside` (sliding door), `Rotate` (hinged door) |
+| `Open Distance` | `3` for SlideUp/Aside. Ignored in Rotate mode. |
+| `Open Angle` | `90` for Rotate mode. |
+| `Open Duration` | `1.2` seconds |
+| `Open Curve` | AnimationCurve — EaseInOut default |
+| `Open VFX` | Particle System that plays on open |
+| `Open SFX` | Door creak/open audio clip |
+
+### To open from a script (e.g. after boss death):
+```csharp
+GetComponent<DoorGate>().Open();
+GetComponent<DoorGate>().OpenImmediate();  // No animation
+```
+
+### To link to a puzzle:
+Set `Linked Puzzle ID` to match the puzzle's `Puzzle ID` field. DoorGate auto-listens to `GameEvents.OnPuzzleSolved`.
+
+---
+
+## 26. World — ItemPickup
+
+**File:** `World/ItemPickup.cs`
+
+### Attach to: Any collectible item prefab with a Trigger Collider.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Item` | Drag the `ItemData.asset` this pickup contains |
+| `Bob Height` | `0.15` |
+| `Bob Speed` | `1.5` |
+| `Rotate Speed` | `60` (degrees/second) |
+| `Collect VFX` | Particle System that plays on collect |
+| `Player Layer` | "Player" layer |
+
+### Unity Steps:
+1. Create a prefab with a mesh (use your Blender models), a Trigger SphereCollider, and `ItemPickup`
+2. Set the collider layer to something visible but not "Enemy"
+3. Spawn via `Instantiate` or place directly in the scene
+
+---
+
+## 27. World — CrystalPickup
+
+**File:** `World/CrystalPickup.cs`
+
+### Attach to: Each of the 6 crystal collectible prefabs.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Crystal Index` | `0` through `5` — each crystal must have a **unique index** |
+| `Bob Height` | `0.2` |
+| `Bob Speed` | `1.2` |
+| `Rotate Speed` | `90` |
+| `Collect VFX` | Crystal burst particle system |
+| `Glow Light` | Child Point Light on the crystal |
+| `Player Layer` | "Player" layer |
+
+### HUD wiring:
+`HUDManager` subscribes to `GameEvents.OnCrystalCollected` — make sure `HUDManager` has the 6 crystal slot icons assigned.
+
+### How to reset between playthroughs:
+```csharp
+CrystalPickup.ResetCount();  // Call on New Game
+```
+
+---
+
+## 28. World — BoatRepairStation
+
+**File:** `World/BoatRepairStation.cs`
+
+### Attach to: A repair zone on the dock (Trigger Collider).
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Repair Amount` | `50` (partial repair per use) |
+| `Full Repair` | ✓ ON to always fully restore durability |
+| `Has Cost` | ✓ ON if repair requires items |
+| `Cost Item` | Drag the `ItemData.asset` for "Wood Plank" or similar |
+| `Cost Amount` | `2` |
+| `Cooldown` | `30` seconds before it can be used again |
+| `Repair VFX` | Hammering/sparks particle system |
+| `Repair SFX` | Wood-hammering audio clip |
+| `Interact Indicator` | "Repair" label or wrench icon |
+
+### Notes:
+- If `Has Cost` is OFF, repair is free and instant.
+- Calls `BoatStats.Repair(amount)` or `BoatStats.FullRepair()` based on `Full Repair` setting.
+- Fires `GameEvents.BoatDurabilityChanged` automatically via `BoatStats`.
+
+---
+
+## 29. World — TutorialTrigger
+
+**File:** `World/TutorialTrigger.cs`
+
+### Attach to: Empty GameObjects placed around Tutorial Island.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Trigger ID` | Short unique string: `"tut_movement"`, `"tut_attack"`, etc. |
+| `Message` | The hint text to display: `"Press WASD to move. Hold Shift to sprint."` |
+| `Icon` | Optional sprite shown alongside the message |
+| `Display Duration` | `4` seconds |
+| `Show Once` | ✓ ON — saved to PlayerPrefs so it doesn't repeat |
+| `Player Layer` | "Player" layer |
+
+### `TutorialHintPanel` Setup:
+1. Create a Canvas child panel named "TutorialHintPanel"
+2. Add `TutorialHintPanel` component
+3. Add `CanvasGroup`, a `TextMeshProUGUI`, and an optional `Image` for icon
+4. Set panel inactive by default — `TutorialTrigger` auto-finds it via `FindObjectOfType`
+
+### Suggested Tutorial Trigger IDs (place zones around the island):
+```
+"tut_movement"   → Near starting beach
+"tut_combat"     → Near first enemy spawn
+"tut_interact"   → Near first NPC/chest
+"tut_boat"       → At the dock
+"tut_map"        → First open ocean view
+```
+
+### Reset all triggers (New Game):
+```csharp
+TutorialTrigger.ResetAll();
+```
+
+---
+
+## 30. Boat — HarpoonProjectile
+
+**File:** `Boat/HarpoonProjectile.cs`
+
+### Attach to: The harpoon projectile prefab (alongside Rigidbody + Collider).
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Damage` | `40` |
+| `Hit Layers` | Layers to hit: Enemy + Boss + Default |
+| `Enable Pull` | ✓ ON — pulls hit Rigidbody toward the boat |
+| `Pull Force` | `8` |
+| `Pull Duration` | `1.5` seconds |
+| `Hit VFX` | Impact spark particle system |
+| `Trail` | TrailRenderer component on the harpoon |
+
+### Unity Steps:
+1. Create a harpoon projectile prefab → add Rigidbody (`isKinematic = false`) + CapsuleCollider (isTrigger = true)
+2. Add `HarpoonProjectile` component
+3. In `BoatController` Inspector: drag this prefab into `Harpoon Projectile Prefab`
+4. Register in `PoolManager`: key = `"Projectile_Harpoon"`, size = `5`
+
+### How pull works:
+On trigger enter, the projectile stops and applies `AddForce` toward the spawn point on the hit Rigidbody for `Pull Duration` seconds, then self-destroys.
+
+---
+
+## 31. Bosses — LavaBallProjectile & LavaPuddle
+
+**File:** `Bosses/LavaBallProjectile.cs`
+
+### LavaBallProjectile — Attach to: LavaBall prefab.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Direct Damage` | `30` |
+| `Splash Damage` | `15` |
+| `Splash Radius` | `2.5` |
+| `Player Layer` | "Player" layer |
+| `Leave Puddle` | ✓ ON |
+| `Puddle Prefab` | LavaPuddle prefab with LavaPuddle script + Trigger Collider |
+| `Puddle Duration` | `4` seconds |
+| `Puddle Damage Per Second` | `8` |
+| `Trail VFX` | Fire trail Particle System |
+| `Impact VFX` | Lava explosion Particle System |
+
+### LavaPuddle — Attach to: LavaPuddle prefab.
+No Inspector setup — initialized by `LavaBallProjectile` via `Initialise(dps, layer)`.
+
+### Unity Steps:
+1. Create LavaBall prefab → Rigidbody + SphereCollider + `LavaBallProjectile`
+2. Create LavaPuddle prefab → flat disc mesh + Trigger CylinderCollider + `LavaPuddle`
+3. Register LavaBall in `PoolManager`: key = `"Projectile_LavaBall"`, size = `10`
+4. Drag LavaBall prefab into `Ignar_MoltenDrake`'s `Lava Ball Prefab` field
+
+---
+
+## 33. UI — MainMenuController
+
+**File:** `UI/MainMenuController.cs`
+
+### Attach to: Root panel of the MainMenu Canvas.
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Main Panel` | The main button panel GameObject |
+| `Save Slot Panel` | The load-game slot selection panel (default inactive) |
+| `New Game Button` | Button → "New Game" |
+| `Continue Button` | Button → "Continue" (loads auto-save slot 0) |
+| `Load Button` | Button → "Load Game" (opens save slot panel) |
+| `Quit Button` | Button → "Quit" |
+| `Slot 1/2/3 Button` | The three save slot buttons |
+| `Slot 1/2/3 Label` | TMP texts showing save timestamps |
+| `Version Text` | TMP text (auto-fills with `Application.version`) |
+
+### Notes:
+- Continue is only interactive if auto-save (slot 0) exists in `SaveManager`.
+- New Game calls `GameManager.ChangeState(Sailing)` + `SceneLoader.LoadSceneAdditive("Ocean_World")`.
+
+---
+
+## 34. UI — PauseMenuController
+
+**File:** `UI/PauseMenuController.cs`
+
+### Attach to: The PauseMenuPanel Canvas child (default inactive).
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Pause Panel` | The panel root GameObject |
+| `Resume Button` | "Resume" button |
+| `Save Button` | "Save Game" button |
+| `Main Menu Button` | "Main Menu" button |
+| `Quit Button` | "Quit Game" button |
+| `Save Confirm Text` | TMP text: "Game Saved!" (shown briefly) |
+| `Save Confirm Display Time` | `2` seconds |
+
+### Toggle Key: `Escape` (default). Blocked during GameOver and Cutscene states.
+
+### To open pause from a button (e.g. in-game menu icon):
+```csharp
+FindObjectOfType<PauseMenuController>().Pause();
+```
+
+---
+
+## 35. UI — GameOverScreen
+
+**File:** `UI/GameOverScreen.cs`
+
+### Attach to: The GameOverPanel Canvas child (default **inactive**).
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Canvas Group` | CanvasGroup on the panel root |
+| `Fade In Duration` | `1.5` |
+| `Delay Before Fade` | `0.8` (pause after player death before panel appears) |
+| `Retry Button` | "Try Again" button |
+| `Main Menu Button` | "Main Menu" button |
+| `Death Message Text` | TMP text (auto-filled with a random death message) |
+
+### How it works:
+Subscribes to `GameEvents.OnPlayerDied` → fades in panel → Retry reloads from auto-save, Main Menu returns to main menu.
+
+---
+
+## 39. UI — MapUI
+
+**File:** `UI/MapUI.cs`
+
+### Attach to: The MapPanel Canvas child (default inactive).
+
+### Inspector Setup:
+| Field | What to set |
+|-------|-------------|
+| `Map Panel` | The map overlay panel |
+| `Toggle Key` | `M` key |
+| `Map Rect` | RectTransform of the background map image |
+| `World Size` | `(2000, 2000)` — matches your ocean world XZ dimensions |
+| `Player Dot` | Small RectTransform dot for player position |
+| `Player Transform` | Drag the Player GameObject (auto-found if null) |
+| `Boat Dot` | Small RectTransform dot for boat position |
+| `Boat Transform` | Drag the Boat GameObject (auto-found if null) |
+| `Island Marker Prefab` | Prefab: Image + TMP label for discovered islands |
+| `Marker Parent` | A parent Transform inside the map panel for markers |
+
+### Island Markers:
+Automatically created when `GameEvents.OnIslandDiscovered` fires. Call `PlaceIslandMarker(islandID, normalizedPos)` to position them precisely on your map texture.
+
+---
+
+## 32. Save System — SaveManager
 
 **File:** `SaveSystem/SaveManager.cs`
 
@@ -608,7 +1060,7 @@ SaveManager.Instance.ApplySaveData(data);
 
 ---
 
-## 22. UI — HUDManager
+## 36. UI — HUDManager
 
 **File:** `UI/HUDManager.cs`
 
@@ -638,7 +1090,7 @@ SaveManager.Instance.ApplySaveData(data);
 
 ---
 
-## 23. UI — BossHealthBarUI
+## 37. UI — BossHealthBarUI
 
 **File:** `UI/BossHealthBarUI.cs`
 
@@ -660,7 +1112,7 @@ SaveManager.Instance.ApplySaveData(data);
 
 ---
 
-## 24. UI — DialogueManager
+## 38. UI — DialogueManager
 
 **File:** `UI/DialogueManager.cs`
 
@@ -692,7 +1144,7 @@ public class NPC : MonoBehaviour, IInteractable
 
 ---
 
-## 25. Audio — AudioManager
+## 40. Audio — AudioManager
 
 **File:** `Audio/AudioManager.cs`
 
@@ -726,7 +1178,7 @@ AudioManager.Instance.PlaySFXAtPosition(splashSound, hitPosition);
 
 ---
 
-## 26. Utilities — PoolManager
+## 41. Utilities — PoolManager
 
 **File:** `Utilities/ObjectPool.cs`
 
@@ -755,7 +1207,7 @@ PoolManager.Instance.ReturnAfterDelay("VFX_FireBurst", obj, 2f);
 
 ---
 
-## 27. Utilities — CameraShaker
+## 42. Utilities — CameraShaker
 
 **File:** `Utilities/CameraShaker.cs`
 
@@ -775,7 +1227,7 @@ CameraShaker.Instance.Shake(intensity: 2f, duration: 0.4f);  // Custom
 
 ---
 
-## 28. Data — ScriptableObjects
+## 43. Data — ScriptableObjects
 
 ### How to create ScriptableObjects:
 
@@ -803,6 +1255,24 @@ Fill in: AbilityID, AbilityName, Type (select from enum), Cooldown, Damage, Icon
 Right-click → `Create → IsleTrial → Dialogue Sequence`
 Fill in each line: SpeakerName, Text, optional Portrait sprite
 
+**LootTable:**
+Right-click → `Create → IsleTrial → Loot Table`
+Add entries: each entry has an `ItemData`, a `Weight` (higher = more likely), and optional `Max Rolls`
+Set `Empty Chance` (0–1) if you want a chance of no drop.
+```csharp
+// Roll one random item:
+ItemData item = myLootTable.Roll();
+
+// Roll multiple (e.g. chest with 2 items):
+List<ItemData> items = myLootTable.RollMultiple(2);
+
+// Guaranteed item (ignores empty chance):
+ItemData item = myLootTable.RollGuaranteed();
+
+// Reset between runs:
+myLootTable.ResetRollCounts();
+```
+
 ### Recommended Folder Structure:
 ```
 Assets/_Game/ScriptableObjects/
@@ -811,12 +1281,13 @@ Assets/_Game/ScriptableObjects/
   ├── Bosses/        (BossData assets)
   ├── Items/         (ItemData assets)
   ├── Abilities/     (AbilityData assets)
-  └── Dialogues/     (DialogueSequence assets)
+  ├── Dialogues/     (DialogueSequence assets)
+  └── LootTables/    (LootTable assets)
 ```
 
 ---
 
-## 29. Complete Bootstrap Scene Setup
+## 44. Complete Bootstrap Scene Setup
 
 The Bootstrap scene is the first scene that loads and persists everything.
 
@@ -865,7 +1336,19 @@ void Start()
 | Boss health bar not appearing | Confirm `GameEvents.BossEncountered()` is being called in `BossBase.Start()` |
 | Pool key not found warning | Register the prefab in PoolManager's `Pool Entries` list |
 | Camera not shaking | Add `CinemachineBasicMultiChannelPerlin` extension to the virtual camera |
+| Door won't open after puzzle solved | Ensure `DoorGate._linkedPuzzleID` exactly matches `PuzzleBase._puzzleID` |
+| Harpoon does nothing on hit | Check `HarpoonProjectile._hitLayers` includes the target's layer |
+| Chest won't give items | Assign a `LootTable` asset to `ChestInteractable._lootTable` |
+| NPC dialogue not starting | Assign a `DialogueSequence` to `NPC._dialogue` and confirm `DialogueManager` is in the scene |
+| FrostSlug not slowing player | Confirm `PlayerStats` is on the Player GameObject (FrostSlug calls `ApplySpeedModifier`) |
+| Tutorial hint not showing | Add `TutorialHintPanel` to the HUD Canvas; `TutorialTrigger` finds it via `FindObjectOfType` |
+| Map not showing player dot | Assign `Player Transform` and `Map Rect` in `MapUI` Inspector |
+| Loot Table always returns null | Check all entries have a valid `Item` assigned and `Empty Chance` is not 1.0 |
+| Game Over screen not appearing | Confirm `GameOverScreen` is in the scene and `GameEvents.PlayerDied()` is firing |
+| Pause menu blocks input | Ensure `PauseMenuController` calls `GameManager.ChangeState(Paused)` — check Time.timeScale is restored on Resume |
 
 ---
 
-*Code Usage Guide Version: 1.0 | Last Updated: March 2026*
+*Code Usage Guide Version: 2.0 | Last Updated: March 2026*
+*Added: HarpoonProjectile, ItemPickup, CrystalPickup, NPC, ChestInteractable, DoorGate, LavaBallProjectile,*
+*PauseMenuController, GameOverScreen, FrostSlug, Glaciara_FrostWarden, BoatRepairStation, MapUI, TutorialTrigger, LootTable*
